@@ -1,0 +1,8 @@
+openai-whisper
+scenedetect[opencv]
+click
+jinja2
+requests
+customtkinter
+moviepy>=1.0.3
+pillow

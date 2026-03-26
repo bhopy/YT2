@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ title }} — YT2 Summary</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #21262d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --text-bright: #f0f6fc;
+    --accent: #1f6feb;
+    --accent-dim: #143d7a;
+    --green: #238636;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* ── Header ─────────────────────────── */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1a1f2b 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 2rem 2.5rem;
+  }
+  .hero-inner {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .hero h1 {
+    font-size: 2rem;
+    color: var(--text-bright);
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 1.5rem;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+  .hero-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  /* ── Overall Summary ────────────────── */
+  .overall {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  .overall-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .overall p {
+    color: var(--text);
+    font-size: 0.95rem;
+    margin-bottom: 0.8rem;
+  }
+  .overall p:last-child { margin-bottom: 0; }
+
+  /* ── Content ────────────────────────── */
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  /* ── Table of Contents ──────────────── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .toc-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+  }
+  .toc li {
+    counter-increment: toc;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .toc li:last-child { border-bottom: none; }
+  .toc li::before {
+    content: counter(toc) ".";
+    color: var(--accent);
+    font-weight: 600;
+    margin-right: 0.5rem;
+    font-size: 0.85rem;
+  }
+  .toc a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  .toc a:hover { color: var(--accent); }
+  .toc .toc-time {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    margin-left: 0.3rem;
+  }
+
+  /* ── Chapter Cards ──────────────────── */
+  .chapter {
+    margin-bottom: 2rem;
+    background: var(--surface);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s;
+  }
+  .chapter:hover { border-color: #30363d; }
+  .chapter-img {
+    width: 100%;
+    display: block;
+    border-bottom: 1px solid var(--border);
+    max-height: 400px;
+    object-fit: cover;
+  }
+  .chapter-body { padding: 1.3rem 1.5rem; }
+  .chapter-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+  }
+  .chapter-num {
+    font-size: 0.7rem;
+    background: var(--accent);
+    color: #fff;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-weight: 600;
+  }
+  .chapter-title-group { flex: 1; }
+  .chapter h2 {
+    font-size: 1.1rem;
+    color: var(--text-bright);
+    line-height: 1.3;
+  }
+  .chapter-time {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .chapter p {
+    color: #c9d1d9;
+    font-size: 0.93rem;
+    line-height: 1.7;
+  }
+
+  /* ── Transcript ─────────────────────── */
+  .transcript-section {
+    margin-top: 3rem;
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+  }
+  .transcript-toggle {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.8rem 1.2rem;
+    color: var(--text);
+    font-size: 0.9rem;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: inherit;
+  }
+  .transcript-toggle:hover { border-color: #30363d; }
+  .transcript-toggle .arrow { transition: transform 0.2s; }
+  .transcript-toggle.open .arrow { transform: rotate(180deg); }
+  .transcript-body {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 1.2rem 1.5rem;
+    max-height: 600px;
+    overflow-y: auto;
+  }
+  .transcript-body.open { display: block; }
+  .t-line {
+    display: flex;
+    gap: 1rem;
+    padding: 0.25rem 0;
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(33, 38, 45, 0.5);
+  }
+  .t-line:last-child { border-bottom: none; }
+  .t-time {
+    color: var(--accent);
+    font-family: 'Consolas', monospace;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    width: 55px;
+    padding-top: 1px;
+  }
+  .t-text { color: var(--text-dim); }
+
+  /* ── Footer ─────────────────────────── */
+  .footer {
+    text-align: center;
+    color: #484f58;
+    font-size: 0.75rem;
+    margin-top: 3rem;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── Scrollbar ──────────────────────── */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+</style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-inner">
+      <h1>{{ title }}</h1>
+      <div class="hero-meta">
+        <span>{{ duration }}</span>
+        <span>{{ chapter_count }} chapters</span>
+        <span>YT2 {{ analysis_type | default('Deep') }} Summary</span>
+      </div>
+
+      <div class="overall">
+        <div class="overall-label">Overview</div>
+        {% for para in overall.split('\n\n') %}
+          {% if para.strip() %}
+          <p>{{ para.strip() }}</p>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Table of Contents -->
+    {% if chapters|length > 3 %}
+    <div class="toc">
+      <div class="toc-label">Chapters</div>
+      <ol>
+        {% for ch in chapters %}
+        <li>
+          <a href="#ch{{ loop.index }}">{{ ch.title }}</a>
+          <span class="toc-time">{{ ch.start }}{% if ch.end %} – {{ ch.end }}{% endif %}</span>
+        </li>
+        {% endfor %}
+      </ol>
+    </div>
+    {% endif %}
+
+    <!-- Chapters -->
+    {% for ch in chapters %}
+    <div class="chapter" id="ch{{ loop.index }}">
+      {% if ch.image_b64 %}
+      <img class="chapter-img" src="data:image/jpeg;base64,{{ ch.image_b64 }}" alt="Chapter {{ loop.index }}">
+      {% endif %}
+      <div class="chapter-body">
+        <div class="chapter-header">
+          <div class="chapter-num">{{ loop.index }}</div>
+          <div class="chapter-title-group">
+            <h2>{{ ch.title }}</h2>
+            <div class="chapter-time">{{ ch.start }}{% if ch.end %} – {{ ch.end }}{% endif %}</div>
+          </div>
+        </div>
+        <p>{{ ch.summary }}</p>
+        {% if ch.vision_analyzed %}
+        <div style="font-size: 0.7rem; color: var(--accent); margin-top: 0.5rem; opacity: 0.7;">&#128065; Includes visual analysis from screenshots</div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <!-- Full Transcript -->
+    <div class="transcript-section">
+      <button class="transcript-toggle" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open');">
+        <span>Full Transcript ({{ transcript|length }} segments)</span>
+        <span class="arrow">&#9660;</span>
+      </button>
+      <div class="transcript-body">
+        {% for line in transcript %}
+        <div class="t-line">
+          <span class="t-time">{{ line.time }}</span>
+          <span class="t-text">{{ line.text }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">YT2 Studio — Local Video Summarizer</div>
+
+</body>
+</html>
